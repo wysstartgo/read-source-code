@@ -878,6 +878,7 @@ public class KafkaProducer<K, V> implements Producer<K, V> {
                     serializedValue, headers, interceptCallback, remainingWaitMs);
             if (result.batchIsFull || result.newBatchCreated) {//判断此次向RecordAccumulator中追加消息后是否满足唤醒Sender线程条件
                 //唤醒Sender线程的条件是消息所在的队列的最后一个ProduceBatch满了或此队列中不止一个ProducerBatch
+                //在客户端将消息发送给服务端之前，会调用RecordAccumulator.ready()方法获取集群中符合发送消息条件的节点集合。
                 log.trace("Waking up the sender since topic {} partition {} is either full or getting a new batch", record.topic(), partition);
                 //唤醒Sender线程，由Sender线程将RecordAccumulator中缓存的消息发送出去
                 this.sender.wakeup();
